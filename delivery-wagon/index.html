@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Questionable Restock Wagon</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bitter:wght@600;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="wagon-header">
+    <p class="eyebrow">for questionable shopkeepers only</p>
+    <h1>The Questionable Restock Wagon</h1>
+    <p class="tagline">Deliver dubious wares straight to the shop. No questions asked, no data harmed &mdash; this demo resets itself every hour.</p>
+  </header>
+
+  <main>
+    <section class="panel">
+      <label class="file-label" for="seed-file">
+        <span class="file-label-text">Choose a seed.sql file</span>
+        <input type="file" id="seed-file" accept=".sql" />
+      </label>
+
+      <div class="button-row">
+        <button id="preview-btn" class="btn btn-secondary" disabled>Preview delivery</button>
+        <button id="deliver-btn" class="btn btn-primary" disabled>Deliver to shop</button>
+      </div>
+
+      <p id="parse-status" class="parse-status"></p>
+    </section>
+
+    <section class="panel">
+      <div class="log-header">
+        <span>Delivery log</span>
+        <span id="summary" class="summary"></span>
+      </div>
+      <pre id="log" class="log"><span class="log-placeholder">Waiting for a seed file...</span></pre>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
