@@ -1,0 +1,534 @@
+{
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [-800, -320],
+      "id": "a1000000-0000-4000-8000-000000000001",
+      "name": "When clicking 'Execute workflow'"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "CREATE TABLE items (\n   id SERIAL PRIMARY KEY,\n   name VARCHAR(255) NOT NULL,\n   price NUMERIC(10, 2) NOT NULL,\n   rarity VARCHAR(20) CHECK (rarity IN ('Common', 'Rare', 'Legendary', 'Cursed')),\n   side_effect TEXT,\n   created_at TIMESTAMP DEFAULT now()\n);",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [-560, -320],
+      "id": "a1000000-0000-4000-8000-000000000002",
+      "name": "Create Items Table",
+      "credentials": {
+        "postgres": {
+          "id": "***",
+          "name": "Postgres RPG Shop"
+        }
+      }
+    },
+
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "items",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [-800, -140],
+      "id": "a1000000-0000-4000-8000-000000000003",
+      "name": "Create Item",
+      "webhookId": "b1000000-0000-4000-8000-000000000003"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            { "id": "f1", "name": "name", "value": "={{ $json.body.name }}", "type": "string" },
+            { "id": "f2", "name": "price", "value": "={{ $json.body.price }}", "type": "number" },
+            { "id": "f3", "name": "rarity", "value": "={{ $json.body.rarity }}", "type": "string" },
+            { "id": "f4", "name": "side_effect", "value": "={{ $json.body.side_effect }}", "type": "string" }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [-580, -140],
+      "id": "a1000000-0000-4000-8000-000000000004",
+      "name": "Prepare New Item"
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "schema": { "__rl": true, "mode": "list", "value": "public" },
+        "table": { "__rl": true, "value": "items", "mode": "list", "cachedResultName": "items" },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "name": "={{ $json.name }}",
+            "price": "={{ $json.price }}",
+            "rarity": "={{ $json.rarity }}",
+            "side_effect": "={{ $json.side_effect }}"
+          },
+          "matchingColumns": ["id"],
+          "schema": [
+            { "id": "id", "displayName": "id", "required": false, "defaultMatch": true, "display": true, "type": "number", "canBeUsedToMatch": true, "removed": true },
+            { "id": "name", "displayName": "name", "required": true, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "price", "displayName": "price", "required": true, "defaultMatch": false, "display": true, "type": "number", "canBeUsedToMatch": true },
+            { "id": "rarity", "displayName": "rarity", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "side_effect", "displayName": "side_effect", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [-360, -140],
+      "id": "a1000000-0000-4000-8000-000000000005",
+      "name": "Insert Item",
+      "credentials": {
+        "postgres": { "id": "****", "name": "Postgres RPG Shop" }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "=Item \"{{ $json.name }}\" created successfully with id {{ $json.id }}.",
+        "options": { "responseCode": 201 }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [-140, -140],
+      "id": "a1000000-0000-4000-8000-000000000006",
+      "name": "Item Created"
+    },
+
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "items",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [-800, 40],
+      "id": "a1000000-0000-4000-8000-000000000007",
+      "name": "Get Items"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            { "id": "g1", "name": "id", "value": "={{ $json.query.id }}", "type": "number" }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [-580, 40],
+      "id": "a1000000-0000-4000-8000-000000000008",
+      "name": "Extract Query Params"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose", "version": 3 },
+          "conditions": [
+            {
+              "id": "h1",
+              "leftValue": "={{ $json.id }}",
+              "rightValue": 0,
+              "operator": { "type": "number", "operation": "exists", "singleValue": true }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [-360, 40],
+      "id": "a1000000-0000-4000-8000-000000000009",
+      "name": "Has ID Filter?"
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "schema": { "__rl": true, "mode": "list", "value": "public" },
+        "table": { "__rl": true, "value": "items", "mode": "list", "cachedResultName": "items" },
+        "returnAll": true,
+        "where": { "values": [ { "column": "id", "value": "={{ $json.id }}" } ] },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [-140, 20],
+      "id": "a1000000-0000-4000-8000-000000000010",
+      "name": "Find Item By ID",
+      "alwaysOutputData": true,
+      "credentials": { "postgres": { "id": "****", "name": "Postgres RPG Shop" } }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict", "version": 3 },
+          "conditions": [
+            {
+              "id": "i1",
+              "leftValue": "={{ $json }}",
+              "rightValue": "",
+              "operator": { "type": "object", "operation": "empty", "singleValue": true }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [80, 20],
+      "id": "a1000000-0000-4000-8000-000000000011",
+      "name": "Item Empty?"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "Item not found",
+        "options": { "responseCode": 404 }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [280, 0],
+      "id": "a1000000-0000-4000-8000-000000000012",
+      "name": "Item Not Found"
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": { "responseCode": 200 }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [280, 140],
+      "id": "a1000000-0000-4000-8000-000000000013",
+      "name": "Item Found"
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "schema": { "__rl": true, "mode": "list", "value": "public" },
+        "table": { "__rl": true, "value": "items", "mode": "list", "cachedResultName": "items" },
+        "returnAll": true,
+        "sort": { "values": [ { "column": "id" } ] },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [-140, 220],
+      "id": "a1000000-0000-4000-8000-000000000014",
+      "name": "Get All Items",
+      "credentials": { "postgres": { "id": "****", "name": "Postgres RPG Shop" } }
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": { "responseCode": 200 }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [80, 220],
+      "id": "a1000000-0000-4000-8000-000000000015",
+      "name": "All Items"
+    },
+
+    {
+      "parameters": {
+        "httpMethod": "PUT",
+        "path": "items",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [-800, 440],
+      "id": "a1000000-0000-4000-8000-000000000016",
+      "name": "Update Item"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            { "id": "j1", "name": "id", "value": "={{ $json.body.id }}", "type": "string" },
+            { "id": "j2", "name": "name", "value": "={{ $json.body.name }}", "type": "string" },
+            { "id": "j3", "name": "price", "value": "={{ $json.body.price }}", "type": "string" },
+            { "id": "j4", "name": "rarity", "value": "={{ $json.body.rarity }}", "type": "string" },
+            { "id": "j5", "name": "side_effect", "value": "={{ $json.body.side_effect }}", "type": "string" }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [-580, 440],
+      "id": "a1000000-0000-4000-8000-000000000017",
+      "name": "Prepare Update Fields"
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "schema": { "__rl": true, "mode": "list", "value": "public" },
+        "table": { "__rl": true, "value": "items", "mode": "list", "cachedResultName": "items" },
+        "returnAll": true,
+        "where": { "values": [ { "column": "id", "value": "={{ $json.id }}" } ] },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [-360, 440],
+      "id": "a1000000-0000-4000-8000-000000000018",
+      "name": "Find Existing Item",
+      "credentials": { "postgres": { "id": "****", "name": "Postgres RPG Shop" } }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "k1",
+              "name": "name",
+              "value": "={{ $('Prepare Update Fields').item.json.name ? $('Prepare Update Fields').item.json.name : $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "k2",
+              "name": "price",
+              "value": "={{ $('Prepare Update Fields').item.json.price ? $('Prepare Update Fields').item.json.price : $json.price }}",
+              "type": "string"
+            },
+            {
+              "id": "k3",
+              "name": "rarity",
+              "value": "={{ $('Prepare Update Fields').item.json.rarity ? $('Prepare Update Fields').item.json.rarity : $json.rarity }}",
+              "type": "string"
+            },
+            {
+              "id": "k4",
+              "name": "side_effect",
+              "value": "={{ $('Prepare Update Fields').item.json.side_effect ? $('Prepare Update Fields').item.json.side_effect : $json.side_effect }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [-140, 440],
+      "id": "a1000000-0000-4000-8000-000000000019",
+      "name": "Merge With Existing"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": { "__rl": true, "mode": "list", "value": "public" },
+        "table": { "__rl": true, "value": "items", "mode": "list", "cachedResultName": "items" },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('Prepare Update Fields').item.json.id }}",
+            "name": "={{ $json.name }}",
+            "price": "={{ $json.price }}",
+            "rarity": "={{ $json.rarity }}",
+            "side_effect": "={{ $json.side_effect }}"
+          },
+          "matchingColumns": ["id"],
+          "schema": [
+            { "id": "id", "displayName": "id", "required": false, "defaultMatch": true, "display": true, "type": "number", "canBeUsedToMatch": true, "removed": false },
+            { "id": "name", "displayName": "name", "required": true, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "price", "displayName": "price", "required": true, "defaultMatch": false, "display": true, "type": "number", "canBeUsedToMatch": true },
+            { "id": "rarity", "displayName": "rarity", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "side_effect", "displayName": "side_effect", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [80, 440],
+      "id": "a1000000-0000-4000-8000-000000000020",
+      "name": "Update Item Row",
+      "credentials": { "postgres": { "id": "****", "name": "Postgres RPG Shop" } }
+    },
+    {
+      "parameters": { "options": { "responseCode": 200 } },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [280, 440],
+      "id": "a1000000-0000-4000-8000-000000000021",
+      "name": "Item Updated"
+    },
+
+    {
+      "parameters": {
+        "httpMethod": "DELETE",
+        "path": "items",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [-800, 660],
+      "id": "a1000000-0000-4000-8000-000000000022",
+      "name": "Delete Item"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            { "id": "l1", "name": "id", "value": "={{ $json.query.id }}", "type": "string" }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [-580, 660],
+      "id": "a1000000-0000-4000-8000-000000000023",
+      "name": "Extract ID"
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "schema": { "__rl": true, "mode": "list", "value": "public" },
+        "table": { "__rl": true, "value": "items", "mode": "list", "cachedResultName": "items" },
+        "returnAll": true,
+        "where": { "values": [ { "column": "id", "value": "={{ $json.id }}" } ] },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [-360, 660],
+      "id": "a1000000-0000-4000-8000-000000000024",
+      "name": "Find Item To Delete",
+      "alwaysOutputData": true,
+      "credentials": { "postgres": { "id": "****", "name": "Postgres RPG Shop" } }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose", "version": 3 },
+          "conditions": [
+            {
+              "id": "m1",
+              "leftValue": "={{ $json }}",
+              "rightValue": "",
+              "operator": { "type": "object", "operation": "empty", "singleValue": true }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [-140, 660],
+      "id": "a1000000-0000-4000-8000-000000000025",
+      "name": "Item Exists?"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "Item not found",
+        "options": { "responseCode": 404 }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [80, 600],
+      "id": "a1000000-0000-4000-8000-000000000026",
+      "name": "Delete: Item Not Found"
+    },
+    {
+      "parameters": {
+        "operation": "deleteTable",
+        "schema": { "__rl": true, "mode": "list", "value": "public" },
+        "table": { "__rl": true, "value": "items", "mode": "list", "cachedResultName": "items" },
+        "deleteCommand": "delete",
+        "where": { "values": [ { "column": "id", "value": "={{ $('Extract ID').item.json.id }}" } ] },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [80, 700],
+      "id": "a1000000-0000-4000-8000-000000000027",
+      "name": "Delete Item Row",
+      "credentials": { "postgres": { "id": "****", "name": "Postgres RPG Shop" } }
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": { "responseCode": 204 }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [280, 700],
+      "id": "a1000000-0000-4000-8000-000000000028",
+      "name": "Item Deleted"
+    }
+  ],
+  "connections": {
+    "When clicking 'Execute workflow'": { "main": [ [ { "node": "Create Items Table", "type": "main", "index": 0 } ] ] },
+
+    "Create Item": { "main": [ [ { "node": "Prepare New Item", "type": "main", "index": 0 } ] ] },
+    "Prepare New Item": { "main": [ [ { "node": "Insert Item", "type": "main", "index": 0 } ] ] },
+    "Insert Item": { "main": [ [ { "node": "Item Created", "type": "main", "index": 0 } ] ] },
+
+    "Get Items": { "main": [ [ { "node": "Extract Query Params", "type": "main", "index": 0 } ] ] },
+    "Extract Query Params": { "main": [ [ { "node": "Has ID Filter?", "type": "main", "index": 0 } ] ] },
+    "Has ID Filter?": {
+      "main": [
+        [ { "node": "Find Item By ID", "type": "main", "index": 0 } ],
+        [ { "node": "Get All Items", "type": "main", "index": 0 } ]
+      ]
+    },
+    "Find Item By ID": { "main": [ [ { "node": "Item Empty?", "type": "main", "index": 0 } ] ] },
+    "Item Empty?": {
+      "main": [
+        [ { "node": "Item Not Found", "type": "main", "index": 0 } ],
+        [ { "node": "Item Found", "type": "main", "index": 0 } ]
+      ]
+    },
+    "Get All Items": { "main": [ [ { "node": "All Items", "type": "main", "index": 0 } ] ] },
+
+    "Update Item": { "main": [ [ { "node": "Prepare Update Fields", "type": "main", "index": 0 } ] ] },
+    "Prepare Update Fields": { "main": [ [ { "node": "Find Existing Item", "type": "main", "index": 0 } ] ] },
+    "Find Existing Item": { "main": [ [ { "node": "Merge With Existing", "type": "main", "index": 0 } ] ] },
+    "Merge With Existing": { "main": [ [ { "node": "Update Item Row", "type": "main", "index": 0 } ] ] },
+    "Update Item Row": { "main": [ [ { "node": "Item Updated", "type": "main", "index": 0 } ] ] },
+
+    "Delete Item": { "main": [ [ { "node": "Extract ID", "type": "main", "index": 0 } ] ] },
+    "Extract ID": { "main": [ [ { "node": "Find Item To Delete", "type": "main", "index": 0 } ] ] },
+    "Find Item To Delete": { "main": [ [ { "node": "Item Exists?", "type": "main", "index": 0 } ] ] },
+    "Item Exists?": {
+      "main": [
+        [ { "node": "Delete: Item Not Found", "type": "main", "index": 0 } ],
+        [ { "node": "Delete Item Row", "type": "main", "index": 0 } ]
+      ]
+    },
+    "Delete Item Row": { "main": [ [ { "node": "Item Deleted", "type": "main", "index": 0 } ] ] }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "rpg-shop-api-portfolio-project"
+  }
+}
