@@ -1,0 +1,94 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -560,
+        -160
+      ],
+      "id": "b2000000-0000-4000-8000-000000000001",
+      "name": "Every Hour"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "TRUNCATE items RESTART IDENTITY;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -340,
+        -160
+      ],
+      "id": "b2000000-0000-4000-8000-000000000002",
+      "name": "Wipe Items Table",
+      "credentials": {
+        "postgres": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "Postgres RPG Shop"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO items (name, price, rarity, side_effect) VALUES\n('Sword of Absolute Truth', 999.99, 'Legendary', 'Forces the user to answer everything with brutal honesty, including opinions on the neighbor''s haircut'),\n('Potion of Healing (questionable flavor)', 15.00, 'Common', 'Heals 100% HP but causes uncontrollable hiccups for 3 days'),\n('Shield of Supreme Cowardice', 45.50, 'Rare', 'Blocks every attack, but the wielder flees screaming before the hit lands'),\n('Ring of Invisibility (works only in the dark)', 320.00, 'Rare', 'Becomes visible the moment someone lights a candle'),\n('Scroll of Random Teleportation', 78.90, 'Cursed', '50% chance of reaching the right place, 50% chance of landing in someone''s bathroom'),\n('Axe of the Philosophical Lumberjack', 60.00, 'Common', 'Cuts any tree, but the wielder stops to question the meaning of life with every swing'),\n('Boots of Relative Speed', 210.00, 'Rare', 'Makes the wearer faster, but everyone nearby moves in slow motion and gets nauseous'),\n('Helm of Partial Wisdom', 133.70, 'Legendary', 'Answers any question correctly, except the one you actually needed'),\n('Wand of Unstable Fire', 88.88, 'Cursed', 'Ignites anything, including the user, 1 in every 10 uses'),\n('Cloak of Borrowed Luck', 199.00, 'Rare', 'Increases your luck, but decreases the luck of everyone nearby'),\n('Dagger of (Almost) Silence', 54.20, 'Common', 'Silent, except for the victim''s scream of pain'),\n('Amulet of Restful Sleep', 40.00, 'Common', 'Guarantees a perfect night''s sleep, unless anyone nearby snores — including you'),\n('Hammer of the Polite Thunder', 450.00, 'Legendary', 'Summons lightning, but it always says \"excuse me\" before striking'),\n('Staff of the Vegan Necromancer', 300.00, 'Rare', 'Raises skeletons, but they refuse to attack anything that was once an herbivore'),\n('Potion of Temporary Strength', 22.50, 'Common', 'Triples your strength for 10 seconds, then you sleep for 2 hours'),\n('Necklace of Universal Language', 175.00, 'Legendary', 'Translates any language, always with a heavy accent'),\n('Arrow That Always Returns', 30.00, 'Cursed', 'Hits the target and flies straight back into your own eye'),\n('Bag of Dimensional Holding', 500.00, 'Legendary', 'Holds anything, but you can never find what you put in it again'),\n('Potion of Eternal Breath', 99.90, 'Rare', 'You never run out of air, but you hiccup with every breath'),\n('Vorpal Sword (blunt edition)', 250.00, 'Cursed', 'Cuts off enemy heads easily, as long as they''re made of bread'),\n('Crystal of Mass Healing', 620.00, 'Legendary', 'Heals the whole party, but everyone''s voice goes squeaky for an hour'),\n('Whip of Questionable Respect', 71.00, 'Common', 'Disarms the enemy, who then sues you for emotional damages'),\n('Grimoire of Self-Taught Spells', 340.00, 'Rare', 'Teaches any spell, but insists on explaining the etymology first'),\n('Seven-League Boot (just one)', 190.00, 'Cursed', 'Walks seven leagues at once, but leaves you limping on one leg forever'),\n('Potion of Shrinking (side effect: duck voice)', 18.00, 'Common', 'Shrinks you down, with an unbearable voice until it wears off'),\n('Mirror of Inconvenient Truth', 260.00, 'Legendary', 'Shows your true self, even when you just wanted to check for food in your teeth'),\n('Ring of Slow Regeneration', 145.00, 'Rare', 'Heals wounds, at the speed of a growing fingernail'),\n('Mirror Shield (reflects insults only)', 95.00, 'Common', 'Reflects magic attacks, but only works against verbal insults'),\n('Staff of Unstable Weather', 410.00, 'Cursed', 'Controls the weather, but always messes up and makes it rain indoors'),\n('Elixir of (Partial) Youth', 555.00, 'Legendary', 'Rejuvenates only the hands, the rest of the body keeps aging normally'),\n('Potion of Silent Invisibility', 65.00, 'Rare', 'No one hears you coming, but everyone can see you perfectly'),\n('Bow of Borrowed Aim', 280.00, 'Legendary', 'Hits any target, but the arrow belongs to another character who bills you later'),\n('Potion of Uneven Growth', 33.00, 'Cursed', 'You grow giant, but only on the left side of your body'),\n('Charm of Partial Bad-Luck Protection', 120.00, 'Common', 'Blocks 1 out of every 3 misfortunes, at random'),\n('Scythe of the Intern Reaper', 700.00, 'Legendary', 'Collects souls, but is still in training and misses sometimes'),\n('Potion of Dragon''s Breath', 88.00, 'Rare', 'Breathe fire, but your regular breath smells terrible for a week'),\n('Pointy Hat of Concentration', 47.00, 'Common', 'Boosts magical intelligence, but gives a splitting headache'),\n('Dagger of the Fine-Print Contract', 310.00, 'Cursed', 'Makes any enemy sign a surrender, in tiny fine print'),\n('Potion of Brief Flight', 155.00, 'Rare', 'You fly, for exactly 4 seconds, with no warning before it ends'),\n('Belt of Bull Strength (Rental)', 210.00, 'Legendary', 'Borrows a bull''s strength, which the bull wants back within 24 hours'),\n('Anti-Sleep Helm (works backwards)', 29.00, 'Common', 'Should keep you awake, instead knocks you out instantly'),\n('Cloak of Chatty Shadows', 380.00, 'Cursed', 'Hides you in darkness, but it won''t stop narrating your plans out loud'),\n('Potion of (Foggy) Mental Clarity', 42.00, 'Common', 'Clears your mind, from inside a thick fog'),\n('Flaming Sword (wet fuse)', 480.00, 'Legendary', 'Catches fire only after 3 attempts with a lighter'),\n('Ring of Charming Enchantment', 265.00, 'Rare', 'Charms anyone, except the one person you actually wanted to charm'),\n('Potion of Doubled Luck (and Bad Luck too)', 130.00, 'Cursed', 'Doubles both your good and bad luck at once, no way to pick which comes first'),\n('Staff of Polite Silence', 90.00, 'Common', 'Silences the enemy, who then communicates through very expressive mime'),\n('Armor of Excessive Confidence', 350.00, 'Rare', 'Makes you look invincible, despite adding zero actual defense'),\n('Tamed Mimic Chest', 800.00, 'Legendary', 'No longer bites, but barks at strangers and steals food from your bag'),\n('Potion of the Guaranteed Last Breath', 5.00, 'Cursed', 'Fully heals you, but only works if you have at least 1 HP left');",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -120,
+        -160
+      ],
+      "id": "b2000000-0000-4000-8000-000000000003",
+      "name": "Reseed Items",
+      "credentials": {
+        "postgres": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "Postgres RPG Shop"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Every Hour": {
+      "main": [
+        [
+          {
+            "node": "Wipe Items Table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wipe Items Table": {
+      "main": [
+        [
+          {
+            "node": "Reseed Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "questionable-magic-items-shop-reset"
+  }
+}
