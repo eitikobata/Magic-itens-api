@@ -5,7 +5,7 @@ A fictional RPG item shop built to demonstrate REST API design, workflow automat
 Every item is genuinely magical. Every side effect is real. No refunds.
 
 **Live:**
-- Shop &mdash; `https://shop.eitikobata.com`
+- Shop &mdash; `https://mshop.eitikobata.com`
 - Restock Wagon (admin/demo tool) &mdash; `https://wagon.eitikobata.com`
 
 ---
