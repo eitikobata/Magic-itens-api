@@ -1,110 +1,73 @@
-# Merchant Inventory System
+The Questionable Magic Items Shop
 
-An end-to-end inventory platform built to explore API design, workflow automation, and system integration using **n8n**, **PostgreSQL**, and **JavaScript**.
+A fictional RPG item shop built to demonstrate REST API design, workflow automation, and integration engineering — end to end, from database to a public-facing storefront.
 
----
+Every item is genuinely magical. Every side effect is real. No refunds.
 
-## Overview
+Live:
 
-This project simulates the inventory workflow of a fantasy merchant.
 
-Rather than focusing on a single application, the goal was to build an ecosystem where independent components communicate through a REST API.
+Shop — https://shop.eitikobata.com
+Restock Wagon (admin/demo tool) — https://wagon.eitikobata.com
 
-The project is divided into three applications working together.
 
-```
-                Seed File
-                    │
-                    ▼
-           Merchant Wagon
-                    │
-              POST /items
-                    │
-                    ▼
-         REST API (n8n Workflow)
-                    │
-               PostgreSQL
-                    │
-               GET /items
-                    │
-                    ▼
-              Magic Shop
-```
 
----
+What this project demonstrates
 
-## Components
+This isn't just a CRUD demo. It's built as a small, self-contained case study in the kind of work that sits between support/CX operations and automation engineering:
 
-### Merchant Inventory API
 
-The backend of the project.
+API design without a traditional backend framework — the REST API is built entirely in n8n, using webhooks, conditional branching, and a Postgres integration, instead of Express/Django/etc.
+System-to-system integration — a standalone script reads raw seed data and populates the API the way a real migration or integration job would, rather than seeding the database directly.
+Operational resilience for a public demo — a scheduled n8n workflow wipes and restores the dataset every hour, so the API can stay public and testable without manual maintenance or requiring authentication.
+A batch operation, both ways — the storefront's cart checkout (DELETE) and the Wagon's bulk import (POST) are the same integration pattern in mirror image: loop over a list, call the API once per item, report success/failure.
 
-Built entirely with **n8n**, it exposes REST endpoints responsible for validating requests, communicating with PostgreSQL, and serving inventory data to client applications.
 
-Features:
+Architecture
 
-- REST endpoints
-- Request validation
-- PostgreSQL integration
-- JSON responses
-- Modular workflow
+seed.sql ──▶ import-seed.js ──▶ POST /items ──┐
+                                                ├──▶ n8n API ──▶ Postgres (items table)
+     Restock Wagon (browser) ──▶ POST /items ──┘         ▲
+                                                           │
+                              Shop (browser) ──▶ GET/DELETE /items
+                                                           │
+                         Scheduled reset (n8n, hourly) ────┘
+                         wipes + re-seeds the table automatically
 
----
+Four independent pieces, connected only by HTTP and a shared JSON shape (name, price, rarity, side_effect). None of them know the others exist beyond that contract — which is the point: it mirrors how real systems integrate.
 
-### Merchant Wagon
+Project structure
 
-A browser-based utility responsible for importing inventory into the API.
+questionable-magic-items-shop/
+├── frontend/          The shop storefront (GET, cart, checkout via DELETE)
+│   └── assets/        Banner image + background music
+├── wagon/              The Restock Wagon (browser-based bulk POST tool)
+│   └── assets/         Banner image
+├── import/              import-seed.js (Node.js one-off seeding script)
+│   └── seed.sql         The 50 items
+└── workflow/            n8n workflow exports + the canonical seed.sql
+    ├── rpg-shop-api-workflow.json    The REST API (POST/GET/PUT/DELETE)
+    └── reset-items-hourly.json       Scheduled wipe + reseed
 
-Instead of inserting data directly into the database, the Wagon reads a structured seed file and sends every item through the API, simulating deliveries from travelling merchants.
+Tech stack
 
-Features:
+LayerToolAPIn8n (webhooks, Postgres node, conditional logic)DatabasePostgreSQLScheduled maintenancen8n (Schedule Trigger)Storefront & WagonVanilla HTML / CSS / JavaScript (no framework, no build step)Import toolingNode.js (native fetch, zero dependencies)HostingEasyPanel (Docker/NixPacks), static per-project deploys under subdomains
 
-- Seed parser
-- Batch upload
-- Preview before import
-- API integration
-- Error handling
+No frontend framework was used on purpose — the goal of this project is to demonstrate integration and API thinking, not frontend engineering. Keeping the client side to plain HTML/CSS/JS keeps that focus honest.
 
----
+Design decisions worth knowing about
 
-### Magic Shop
+The API is REST-shaped, not strictly RESTful. Resource identifiers are passed via query string (?id=) rather than as part of the URL path (/items/5). This is a common simplification in low-code API tooling like n8n, and a deliberate trade-off, not an oversight.
 
-A frontend consuming the API.
+There's no authentication on the write endpoints. Instead of a login gate, the dataset self-heals: a scheduled workflow wipes and reseeds the table every hour. This removes the friction of a demo needing credentials, while keeping the underlying data safe from permanent corruption. It also means the write endpoints are intentionally rate-limited by dataset size, not by user identity.
 
-It retrieves inventory in real time and displays the available items inside a fantasy-themed merchant interface.
+The cart (shop) and the bulk importer (Wagon) share one pattern. Both take a list, loop over it, and call the API once per item with a running success/failure count. It's the same integration logic used in the opposite direction — a small detail, but a deliberate one.
 
-Features:
+Running it yourself
 
-- Dynamic inventory
-- Live API consumption
-- Responsive interface
-- Error handling
-- RPG-inspired presentation
 
----
-
-## Technologies
-
-- n8n
-- PostgreSQL
-- JavaScript
-- HTML5
-- CSS3
-- REST API
-
----
-
-## Why this project?
-
-The objective wasn't simply to build another CRUD application.
-
-Instead, I wanted to understand how different services communicate while keeping each one responsible for a single task.
-
-This project explores concepts such as:
-
-- API-first architecture
-- Workflow automation
-- Data pipelines
-- Separation of concerns
-- Frontend ↔ Backend communication
-- Database integration
+API — import workflow/rpg-shop-api-workflow.json into your own n8n instance, connect a Postgres credential, activate the workflow.
+Reset schedule — import workflow/reset-items-hourly.json the same way. Adjust the interval in the Schedule Trigger node if you don't want hourly resets.
+Seed the database — either run the Postgres CREATE TABLE node manually once, or run import/import-seed.js (node import-seed.js --dry-run first, then for real) against your webhook URL.
+Frontend — open frontend/index.html directly, or deploy the folder as a static site. Update API_URL at the top of frontend/script.js first.
+Wagon — same idea, wagon/index.html, API_URL in wagon/script.js.
