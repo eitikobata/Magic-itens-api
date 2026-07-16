@@ -1,11 +1,57 @@
-// script.js
-//
-// Reimplementa a mesma lógica do import-seed.js (Node), só que rodando
-// no navegador: lê o arquivo seed.sql selecionado localmente, faz o parse
-// e envia cada item via POST para a API do n8n.
-
 const API_URL = 'https://tools-n8n.cpcp6o.easypanel.host/webhook/items';
 const DELAY_BETWEEN_REQUESTS_MS = 300;
+
+// ---------------------------------------------------------------------------
+// GOBLIN DIALOGUE — add or edit lines here, same pattern as the shop's orc.
+// ---------------------------------------------------------------------------
+const DIALOGUE = {
+  idle: [
+    "Are you gonna load this wagon or what?",
+    "I don't have all day, you know.",
+    "This cart won't fill itself.",
+    "Tick tock. The shop's waiting.",
+  ],
+  onFileLoaded: [
+    "Finally, some cargo!",
+    "About time. Let's get moving.",
+  ],
+  onPreview: [
+    "Just looking? Fine, I'll wait. Again.",
+  ],
+  onDeliverComplete: [
+    "Finally!!!",
+    "About time! Delivery complete.",
+    "Finally! My arms were getting tired just watching.",
+  ],
+  onDeliverError: [
+    "Ugh. Not again.",
+    "Something's stuck. Typical.",
+  ],
+};
+
+const IDLE_INTERVAL_MS = 22000;
+const CONTEXTUAL_LINE_DURATION_MS = 4500;
+
+const goblinSpeech = document.getElementById('goblin-speech-text');
+let speechLockUntil = 0;
+
+function pickLine(pool) {
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+function say(text, { lockMs = CONTEXTUAL_LINE_DURATION_MS } = {}) {
+  if (!goblinSpeech) return;
+  goblinSpeech.textContent = text;
+  speechLockUntil = Date.now() + lockMs;
+}
+
+function sayIdle() {
+  if (Date.now() < speechLockUntil) return;
+  say(pickLine(DIALOGUE.idle), { lockMs: IDLE_INTERVAL_MS });
+}
+
+setInterval(sayIdle, IDLE_INTERVAL_MS);
+say(pickLine(DIALOGUE.idle), { lockMs: IDLE_INTERVAL_MS });
 
 const fileInput = document.getElementById('seed-file');
 const previewBtn = document.getElementById('preview-btn');
@@ -38,6 +84,7 @@ async function handleFileSelect() {
   previewBtn.disabled = false;
   deliverBtn.disabled = false;
   clearLog();
+  say(pickLine(DIALOGUE.onFileLoaded));
 }
 
 // Espera o mesmo formato usado pelo import-seed.js:
@@ -88,6 +135,7 @@ async function runDelivery({ dryRun }) {
 
   if (dryRun) {
     appendLog('--- PREVIEW MODE: nothing will be sent ---', null);
+    say(pickLine(DIALOGUE.onPreview));
   }
 
   let success = 0;
@@ -117,6 +165,10 @@ async function runDelivery({ dryRun }) {
   summary.textContent = `${success} delivered, ${failed} failed`;
   previewBtn.disabled = false;
   deliverBtn.disabled = false;
+
+  if (!dryRun) {
+    say(pickLine(failed === 0 ? DIALOGUE.onDeliverComplete : DIALOGUE.onDeliverError));
+  }
 }
 
 function clearLog() {
