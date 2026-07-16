@@ -277,4 +277,6 @@ sortSelect.addEventListener('change', (e) => {
   renderShelf();
 });
 
+buyBtn.addEventListener('click', checkout);
+
 loadItems();
