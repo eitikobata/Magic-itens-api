@@ -83,4 +83,4 @@ No frontend framework was used on purpose &mdash; the goal of this project is to
 Built by Eiti Kobata as a portfolio project, transitioning from 18 years in customer experience toward CX Ops, Support Ops, and automation engineering roles.
 
 - GitHub: [@eitikobata](https://github.com/eitikobata)
-- LinkedIn: _add your link here_
+- LinkedIn: https://www.linkedin.com/in/eiti-kobata-ab5ba7214/
