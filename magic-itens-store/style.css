@@ -31,9 +31,38 @@ body {
 }
 
 .shop-header {
+  position: relative;
   text-align: center;
   padding: 1.75rem 1.5rem 1rem;
   border-bottom: 1px solid var(--border);
+}
+
+.cross-link {
+  position: absolute;
+  top: 1rem;
+  right: 1.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-decoration: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.4rem 0.7rem;
+  background: var(--bg-card);
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.cross-link:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+@media (max-width: 560px) {
+  .cross-link {
+    position: static;
+    display: inline-block;
+    margin-bottom: 0.75rem;
+  }
 }
 
 .eyebrow {
