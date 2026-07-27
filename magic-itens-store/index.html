@@ -19,35 +19,37 @@
     <p class="tagline">Genuine magic items. Side effects are not optional.</p>
   </header>
 
-  <section class="tavern" id="tavern">
-    <img class="tavern-bg" src="assets/images/orc-banner.png" alt="A grumpy orc merchant standing behind his shop counter" />
+  <div class="sticky-tavern">
+    <section class="tavern" id="tavern">
+      <img class="tavern-bg" src="assets/images/orc-banner.png" alt="A grumpy orc merchant standing behind his shop counter" />
 
-    <div class="speech-bubble" id="speech-bubble">
-      <p id="speech-text">...</p>
+      <div class="speech-bubble" id="speech-bubble">
+        <p id="speech-text">...</p>
+      </div>
+
+      <div class="counter-items" id="counter-items"></div>
+    </section>
+
+    <div class="control-bar">
+      <div class="cart-info">
+        <span id="cart-count">0</span> item(s) on the counter &mdash; <span id="cart-total">$0.00</span>
+      </div>
+
+      <button id="buy-btn" class="btn btn-primary" disabled>Buy</button>
+
+      <label class="sort-label" for="sort-select">Sort by</label>
+      <select id="sort-select">
+        <option value="default">Shelf order</option>
+        <option value="price-asc">Price (low to high)</option>
+        <option value="price-desc">Price (high to low)</option>
+        <option value="name-asc">Name (A-Z)</option>
+        <option value="rarity">Rarity</option>
+      </select>
+
+      <button id="music-toggle" class="btn btn-secondary" aria-label="Play or pause music">
+        <span id="music-icon">&#9654;</span>
+      </button>
     </div>
-
-    <div class="counter-items" id="counter-items"></div>
-  </section>
-
-  <div class="control-bar">
-    <div class="cart-info">
-      <span id="cart-count">0</span> item(s) on the counter &mdash; <span id="cart-total">$0.00</span>
-    </div>
-
-    <button id="buy-btn" class="btn btn-primary" disabled>Buy</button>
-
-    <label class="sort-label" for="sort-select">Sort by</label>
-    <select id="sort-select">
-      <option value="default">Shelf order</option>
-      <option value="price-asc">Price (low to high)</option>
-      <option value="price-desc">Price (high to low)</option>
-      <option value="name-asc">Name (A-Z)</option>
-      <option value="rarity">Rarity</option>
-    </select>
-
-    <button id="music-toggle" class="btn btn-secondary" aria-label="Play or pause music">
-      <span id="music-icon">&#9654;</span>
-    </button>
   </div>
 
   <main>
